@@ -1,0 +1,94 @@
+swagger: 2.0.0
+info:
+  description: >-
+
+    The FX Payment Api allows clients to manage FX data.
+
+  version: "1.0"
+  title: "FX Payment Api"
+  contact:
+    email: "javier-1982@hotmail.com"
+tags:
+  - name: FX
+    description: Manage FX
+
+schemes:
+- "http"
+definitions:
+  ErrorResponse:
+    description: >-
+      Contains information about an error in the FX Payment.
+    type: "object"
+    properties:
+      message:
+        description: >-
+          A short description of the error.
+        type: "string"
+      ref:
+        description: "Reference code"
+        type: "string"
+
+  FXDTO:
+    description: >-
+      A FX
+    type: "object"
+    required:
+      - id
+      - paymentId
+      - originalAmount
+      - currency
+      - contactReference
+    properties:
+      id:
+        description: >-
+          A unique identifier for the fx.
+        type: "string"
+      paymentId:
+        description: >-
+          A unique identifier for the payment.
+        type: "string"
+      originalAmount:
+        description: >-
+          the original amount.
+        type: number
+        format: float
+        minimum: 1
+      exchangeRate:
+        description: >-
+          The exchange rate agains the local currency GBP
+        type: number
+        format: float
+        minimum: 0
+      currency:
+        description: >-
+          Currency code, for example: GBP, EUR
+        type: "string"
+      contactReference:
+        description: >-
+          The reference of the payment
+        type: "string"
+
+paths:
+  /fx/{paymentId}:
+    get:
+      tags:
+        - FX
+      summary: Return a FX
+      operationId: getFX
+      produces:
+        - application/json
+      parameters:
+        - name: paymentId
+          in: path
+          description: "Unique identifier for the payment"
+          type: string
+          required: true
+      responses:
+        200:
+          description: FX matching provided identifier
+          schema:
+            $ref: '#/definitions/FXDTO'
+        404:
+          description: "No FX exists matching payment identifier"
+          schema:
+            $ref: '#/definitions/ErrorResponse'

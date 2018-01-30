@@ -1,0 +1,373 @@
+swagger: 2.0.0
+info:
+  description: >-
+
+    The Facade Payment Api allows clients to CRUD payments.
+
+  version: "1.0"
+  title: "Facade Payment Api"
+  contact:
+    email: "javier-1982@hotmail.com"
+tags:
+  - name: payment
+    description: Manage payments
+
+schemes:
+- "http"
+definitions:
+  ErrorResponse:
+    description: >-
+      Contains information about an error in the Facade Payment.
+    type: "object"
+    properties:
+      message:
+        description: >-
+          A short description of the error.
+        type: "string"
+      ref:
+        description: "Reference code"
+        type: "string"
+
+  PartyDTO:
+    description: >-
+      Attributes of any party during the process of the payment.
+    type: object
+    required:
+      - accountNumberCode
+      - accountNumber
+    properties:
+      accountNumberCode:
+        type: "string"
+      accountNumber:
+        type: "string"
+      accountName:
+        type: "string"
+      address:
+        type: "string"
+      bankId:
+        type: "string"
+      bankIdCode:
+        type: "string"
+      name:
+        type: "string"
+
+  PaymentSchemeDTO:
+    type: "string"
+    enum:
+      - FPS
+    example: "FPS"
+
+  TranscationTypeDTO:
+    type: "string"
+    enum:
+      - Payment
+      - Refund
+    example: "Payment"
+
+  PaymentTypeDTO:
+    type: "string"
+    enum:
+      - CREDIT
+      - DEBIT
+    example: "CREDIT"
+
+  SchemaPaymentSubTypeDTO:
+    type: "string"
+    enum:
+      - INTERNET_BANKING
+    example: "INTERNET_BANKING"
+
+  SchemaPaymentTypeDTO:
+    type: "string"
+    enum:
+      - IMMEDIATE_PAYMENT
+    example: "IMMEDIATE_PAYMENT"
+
+  ForexDTO:
+    description: >-
+      A FX
+    type: "object"
+    required:
+      - id
+      - paymentId
+      - originalAmount
+      - currency
+      - contactReference
+    properties:
+      id:
+        description: >-
+          A unique identifier for the fx.
+        type: "string"
+      paymentId:
+        description: >-
+          A unique identifier for the payment.
+        type: "string"
+      originalAmount:
+        description: >-
+          the original amount.
+        type: number
+        format: float
+        minimum: 1
+      exchangeRate:
+        description: >-
+          The exchange rate agains the local currency GBP
+        type: number
+        format: float
+        minimum: 0
+      currency:
+        description: >-
+          Currency code, for example: GBP, EUR
+        type: "string"
+      contactReference:
+        description: >-
+          The reference of the payment
+        type: "string"
+
+  PaymentAttributesRequest:
+      description: >-
+        Attributes of a payment
+      type: object
+      required:
+        - amount
+        - currency
+        - paymentType
+        - beneficiaryParty
+        - debtorParty
+        - paymentScheme
+        - schemePaymentSubType
+        - schemePaymentType
+      properties:
+        amount:
+          type: number
+          format: float
+          minimum: 1
+        currency:
+          type: "string"
+        endToEndReference:
+          type: "string"
+        paymentPurpose:
+          type: "string"
+        paymentScheme:
+          $ref: '#/definitions/PaymentSchemeDTO'
+        paymentType:
+          $ref: '#/definitions/PaymentTypeDTO'
+        referene:
+          type: "string"
+        schemePaymentSubType:
+          $ref: '#/definitions/SchemaPaymentSubTypeDTO'
+        schemePaymentType:
+          $ref: '#/definitions/SchemaPaymentTypeDTO'
+        beneficiaryParty:
+          $ref: '#/definitions/PartyDTO'
+        debtorParty:
+          $ref: '#/definitions/PartyDTO'
+        sponsorParty:
+          $ref: '#/definitions/PartyDTO'
+
+  PaymentAttributesDTO:
+    description: >-
+      Attributes of a payment
+    type: object
+    properties:
+      amount:
+        type: number
+        format: float
+        minimum: 1
+      currency:
+        type: "string"
+      endToEndReference:
+        type: "string"
+      paymentPurpose:
+        type: "string"
+      paymentScheme:
+        $ref: '#/definitions/PaymentSchemeDTO'
+      paymentType:
+        $ref: '#/definitions/PaymentTypeDTO'
+      processingDate:
+        type: "string"
+      referene:
+        type: "string"
+      schemePaymentSubType:
+        $ref: '#/definitions/SchemaPaymentSubTypeDTO'
+      schemePaymentType:
+        $ref: '#/definitions/SchemaPaymentTypeDTO'
+      beneficiaryParty:
+        $ref: '#/definitions/PartyDTO'
+      debtorParty:
+        $ref: '#/definitions/PartyDTO'
+      sponsorParty:
+        $ref: '#/definitions/PartyDTO'
+      fx:
+        $ref: '#/definitions/ForexDTO'
+
+  PaymentRequest:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type: &TRANSACTION_TYPE
+        $ref: '#/definitions/TranscationTypeDTO'
+      attributes: &PAYMENT_ATTRIBUTES
+        $ref: '#/definitions/PaymentAttributesRequest'
+
+  LinkDTO:
+    description: >-
+      Hypermedia link
+    type: object
+    properties:
+      self:
+        type: "string"
+      first:
+        type: "string"
+      prev:
+        type: "string"
+      next:
+        type: "string"
+
+  LinkList:
+    type: "array"
+    items:
+      $ref: "#/definitions/LinkDTO"
+
+  PaymentDTO:
+    description: >-
+      A Payment
+    type: "object"
+    required:
+      - id
+      - type
+      - attributes
+    properties:
+      id: &PAYEMNT_ID
+        description: >-
+          A unique identifier for the payment.
+        type: "string"
+      links:
+        $ref: '#/definitions/LinkList'
+      type: &TRANSACTION_TYPE
+        $ref: '#/definitions/TranscationTypeDTO'
+      attributes: &PAYMENT_ATTRIBUTES
+        $ref: '#/definitions/PaymentAttributesDTO'
+
+  PaymentList:
+      type: "array"
+      items:
+        $ref: "#/definitions/PaymentDTO"
+
+paths:
+  /payment:
+    post:
+      operationId: createPayment
+      tags:
+        - payment
+      description: >-
+        Create a new payment
+      parameters:
+        - in: body
+          name: body
+          description: >-
+            Representation of the payment with attributes required for
+            creation.
+          schema:
+            $ref: '#/definitions/PaymentRequest'
+      responses:
+        201:
+          description: A representation of the Payment
+          schema:
+            $ref: '#/definitions/PaymentDTO'
+        400:
+          description: >-
+            Bad request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    get:
+      tags:
+        - payment
+      summary: List of all payments
+      description: >-
+        Returns an array of all payments.
+      operationId: listPayments
+      produces:
+        - application/json
+      responses:
+        200:
+          description: "List of Payments"
+          schema:
+            $ref: '#/definitions/PaymentList'
+
+  /payment/{paymentId}:
+    get:
+      tags:
+        - payment
+      summary: Return a payment
+      operationId: getPayment
+      produces:
+        - application/json
+      parameters:
+        - name: paymentId
+          in: path
+          description: "Unique identifier for the payment"
+          type: string
+          required: true
+      responses:
+        200:
+          description: Payment matching provided identifier
+          schema:
+            $ref: '#/definitions/PaymentDTO'
+        404:
+          description: "No payment exists matching provided identifier"
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      tags:
+        - payment
+      summary: Update an existing payment
+      operationId: updatePayment
+      produces:
+        - application/json
+      parameters:
+        - name: paymentId
+          in: path
+          description: "Unique identifier for the payment"
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: >-
+            Representation of the payment with attributes which can be updated.
+          schema:
+            $ref: '#/definitions/PaymentRequest'
+      responses:
+        200:
+          description: Representation of payment matching provided identifier
+          schema:
+            $ref: '#/definitions/PaymentDTO'
+        404:
+          description: No payment exists matching provided identifier
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+        - payment
+      summary: Delete an existing payment
+      description: >-
+        Delete an existing payment.
+
+        This will delete all the data related to the payment.
+      operationId: deletePayment
+      produces:
+        - application/json
+      parameters:
+        - name: paymentId
+          in: path
+          description: "Unique identifier for the payment"
+          type: string
+          required: true
+      responses:
+        202:
+          description: Representation of payment accept to delete
+        404:
+          description: No payment exists matching provided identifier
+          schema:
+            $ref: '#/definitions/ErrorResponse'
