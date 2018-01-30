@@ -5,7 +5,7 @@ The Payment API is a RESTFUL API providing the following features:
 - List a collection of payment resources
 - Persist resource state (e.g. to a database)
 
-## Design
+##Design
 The following design is following the principles of Reactive Microservices and Domain Driven Design (DDD)
 - Facade Payment API: It's a Reactive Microservice responsible to handler the communication with a HTTP Client.
 It provides all the public endpoints to do CRUD. It's storing the payment data into a MongoDB. Also it's a message driven component to provide a Non-blocking communication which allows the clients to get a quicker response. For example, when creating, updating or deleting a payment this component is creating a message to communicate with other components like FX Payment API.
@@ -14,7 +14,7 @@ It provides all the public endpoints to do CRUD. It's storing the payment data i
 
 ![./FACADE-API](./design.png)
 
-## Modules
+##Modules
 This project includes the following maven modules:
 
 - payment-facade-client: It's an auto-generated module created by Swagger following the specification from payment-facade.yaml. It's provide the HTTP Client actions in a Jar file to do CRUD operation against facade payment facade server.
@@ -32,11 +32,11 @@ This project includes the following maven modules:
 - payment-integration-test: It the BDD feature files for this project.
 
 
-## RESTFUL API
+##RESTFUL API
 ![./FACADE-API](./facade-api.png)
 ![./FX-API](./fx-api.png)
 
-## Technologies
+##Technologies
 This is the technologies stack
 - Java 8
 - Maven
@@ -50,7 +50,7 @@ This is the technologies stack
 - Mockito
 - Cucumber
 
-## How to build and run
+##How to build and run
 First it's required to run the docker containers for MongoDB and RabbitMQ:
 1. from the command line: `docker-compose up -d`
 2. Once the containers are running, you can build the project using `mvn clean install`. As this project includes integration test, it needs run facade server impl and facade fx server impl, so it might take few seconds before running the integration tests.
@@ -60,11 +60,11 @@ First it's required to run the docker containers for MongoDB and RabbitMQ:
 
 `java -jar /payment-fx-server-impl/target/payment-fx-server-impl-0.1.0.jar`
 
-## Links
+##Links
 https://www.reactivemanifesto.org/
 
 http://domainlanguage.com/ddd/
 
-## ToDo
+##ToDo
 - Currently the Facade Payment API storing data about the payment and others like beneficary Party, debtor Party and Sponsor Party. That could be hanlder in a different Reactive Microservice following DDD as FX Payment API.
  
